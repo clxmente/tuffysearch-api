@@ -8,7 +8,7 @@ from slowapi import Limiter
 from dotenv import load_dotenv
 from slowapi.util import get_remote_address
 from fastapi.security import APIKeyHeader
-from fastapi import FastAPI, Request, Depends
+from fastapi import FastAPI, HTTPException, Request, Depends
 from sentence_transformers import SentenceTransformer
 
 # setting up and customizing loguru
@@ -30,7 +30,7 @@ header_scheme = APIKeyHeader(name="x-api-key")
 API_KEY = os.getenv("API_KEY")
 
 with open(os.path.join("data", "courses.json"), "r") as f:
-    courses = list(json.load(f).values())
+    courses = json.load(f)
 
 index = faiss.read_index(os.path.join("data", "course_index.faiss"))
 
@@ -38,9 +38,11 @@ index = faiss.read_index(os.path.join("data", "course_index.faiss"))
 @app.get("/search")
 @limiter.limit("100/hour")
 async def search(request: Request, q: str, api_key: str = Depends(header_scheme)):
-    logger.info(f"Query: '{q}' | API Key: {api_key}")
+    if api_key != API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid API Key")
 
     query_embedding = model.encode([q]).astype("float32")
-    distances, indices = index.search(query_embedding.astype("float32"), 10)
+    faiss.normalize_L2(query_embedding)
+    distances, indices = index.search(query_embedding, 10)
 
     return {"results": [courses[i] for i in indices[0].tolist()]}
