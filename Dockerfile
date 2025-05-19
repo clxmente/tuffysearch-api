@@ -11,4 +11,4 @@ WORKDIR /app
 RUN uv sync --frozen --no-cache
 
 # Run application
-CMD ["/app/.env/bin/fastapi", "run", "main.py", "--port", "80", "--host", "0.0.0.0"]
+CMD ["/app/.venv/bin/fastapi", "run", "main.py", "--port", "80", "--host", "0.0.0.0"]
