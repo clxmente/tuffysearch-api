@@ -69,8 +69,7 @@ async def search(
             status_code=400, detail="min_level must be less than max_level"
         )
 
-    logger.info(f"min_level: {min_level}, max_level: {max_level}")
-    results = db.similarity_search(
+    results = await db.asimilarity_search(
         q,
         k=10,
         filter={
@@ -81,5 +80,4 @@ async def search(
         },
     )
     list_results = [r.metadata for r in results]
-    logger.info(f"list_results length: {len(list_results)}")
     return {"results": list_results}
