@@ -43,18 +43,12 @@ cd tuffysearch-api
 uv sync
 ```
 
-3. Set up your environment variables:
-```bash
-cp .env.example .env
-# Edit .env with your API key
-```
-
-4. Run the setup script to create embeddings:
+3. Run the setup script to create embeddings:
 ```bash
 uv run setup_embeddings.py
 ```
 
-5. Start the API server:
+4. Start the API server:
 ```bash
 uv run fastapi dev main.py
 ```
@@ -76,14 +70,8 @@ Once the server is running, visit:
 ### Example Request
 
 ```bash
-curl -X GET "http://localhost:8000/search?q=income%20inequality&min_level=100&max_level=399" \
-     -H "x-api-key: your-api-key"
+curl -X GET "http://localhost:8000/search?q=income%20inequality&min_level=100&max_level=400"
 ```
-
-## 🔒 Security
-
-- API key authentication required for search endpoint
-- Rate limiting to prevent abuse
 
 ## 📝 License
 
