@@ -3,12 +3,13 @@ import sys
 
 from loguru import logger
 from slowapi import Limiter
+from typing import Annotated
 from dotenv import load_dotenv
 from fastapi.security import APIKeyHeader
 from slowapi.util import get_remote_address
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
-from fastapi import FastAPI, HTTPException, Request, Depends
+from fastapi import FastAPI, HTTPException, Request, Depends, Query
 
 # setting up and customizing loguru
 logger.remove()
@@ -39,9 +40,25 @@ db = FAISS.load_local(
 @limiter.limit("100/hour")
 async def search(
     request: Request,
-    q: str,
-    min_level: int = 1,
-    max_level: int = 5,
+    q: Annotated[str, Query(min_length=3, max_length=256, title="Search Query")],
+    min_level: Annotated[
+        int,
+        Query(
+            ge=100,
+            lt=600,
+            title="Minimum Course Level",
+            description="Minimum course level to search for and include in results",
+        ),
+    ] = 100,
+    max_level: Annotated[
+        int,
+        Query(
+            ge=100,
+            lt=600,
+            title="Maximum Course Level",
+            description="Maximum course level to search for and include in results",
+        ),
+    ] = 599,
     api_key: str = Depends(header_scheme),
 ):
     if api_key != API_KEY:
@@ -52,14 +69,17 @@ async def search(
             status_code=400, detail="min_level must be less than max_level"
         )
 
+    logger.info(f"min_level: {min_level}, max_level: {max_level}")
     results = db.similarity_search(
         q,
         k=10,
         filter={
-            "$and": [{"level": {"$gte": min_level}}, {"level": {"$lte": max_level}}]
+            "$and": [
+                {"course_level": {"$gte": min_level}},
+                {"course_level": {"$lte": max_level}},
+            ]
         },
     )
-
     list_results = [r.metadata for r in results]
-
+    logger.info(f"list_results length: {len(list_results)}")
     return {"results": list_results}

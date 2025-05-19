@@ -48,6 +48,7 @@ else:
     print("faiss index loaded")
 
 print("searching for courses...")
-res = db.similarity_search("income inequality", k=5, filter={"level": {"$lte": 5}})
-for r in res:
-    print(json.dumps(r.metadata, indent=2))
+res = db.similarity_search(
+    "income inequality", k=5, filter={"course_level": {"$lte": 399}}
+)
+print(res)
