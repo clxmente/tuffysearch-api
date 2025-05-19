@@ -1,7 +1,7 @@
 [project]
 name = "tuffysearch-api"
 version = "0.1.0"
-description = "Add your description here"
+description = "A FastAPI-powered semantic search API for CSUF course catalog, enabling intelligent course discovery through natural language queries"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
