@@ -58,7 +58,9 @@ uv run fastapi dev main.py
 Build and run using Docker:
 ```bash
 docker build -t tuffysearch-api .
-docker run -p 80:80 tuffysearch-api
+docker run -p 80:80 tuffysearch-api --restart=always
+# OR with compose
+docker compose up -d --build
 ```
 
 ## 📚 API Documentation
