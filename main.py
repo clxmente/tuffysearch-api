@@ -5,6 +5,7 @@ from loguru import logger
 from slowapi import Limiter
 from typing import Annotated
 from slowapi.util import get_remote_address
+from fastapi.middleware.cors import CORSMiddleware
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from fastapi import FastAPI, HTTPException, Request, Query
@@ -22,6 +23,19 @@ embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-
 # setting up rate limiter
 limiter = Limiter(key_func=get_remote_address, storage_uri="memory://")
 app.state.limiter = limiter
+# set up cors since we will be requesting from client side
+origins = [
+    "http://localhost:3000",
+    "https://tuffysearch.com",
+    "https://www.tuffysearch.com",
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET"],
+    allow_headers=["*"],
+)
 # load the faiss index from disk into memory
 db = FAISS.load_local(
     os.path.join("data", "faiss_index"),
