@@ -53,7 +53,7 @@ async def search(
         int,
         Query(
             ge=100,
-            lt=600,
+            le=600,
             title="Minimum Course Level",
             description="Minimum course level to search for and include in results",
         ),
@@ -62,7 +62,7 @@ async def search(
         int,
         Query(
             ge=100,
-            lt=600,
+            le=600,
             title="Maximum Course Level",
             description="Maximum course level to search for and include in results",
         ),
