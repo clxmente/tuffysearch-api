@@ -9,19 +9,10 @@ print("loading model...")
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 print("model loaded")
 
-# if the courses don't exist as an array, transform them
-if not os.path.exists(os.path.join("data", "courses.json")):
-    print("transforming catalog to list of courses...")
-    with open(os.path.join("data", "cleaned_2025-2026_catalog.json"), "r") as f:
-        catalog = json.load(f)
-    with open(os.path.join("data", "courses.json"), "w") as f:
-        data = list(catalog.values())
-        json.dump(data, f, indent=2)
-        print("completed transformation")
-else:
-    print("courses already exist, skipping transformation...")
-    with open(os.path.join("data", "courses.json"), "r") as f:
-        data = json.load(f)
+COURSES_FILE = "processed_2025-2026_catalog.json"
+
+with open(os.path.join("data", COURSES_FILE), "r") as f:
+    data = json.load(f)
 
 if not os.path.exists(os.path.join("data", "faiss_index")):
     print("faiss index does not exist, creating documents with metadata...")
@@ -30,7 +21,7 @@ if not os.path.exists(os.path.join("data", "faiss_index")):
     for course in data:
         documents.append(
             Document(
-                page_content=f"{course['department']} {course['title']} {course['description']}",
+                page_content=f"{course['department']} . {course['title']} . {course['description']}",
                 metadata=course,
             )
         )
